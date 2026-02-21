@@ -40,7 +40,7 @@ export default function DashboardLayout({
         }`;
 
     return (
-        <div className="flex min-h-screen bg-gray-100">
+        <div className="flex min-h-screen bg-gray-100 overflow-hidden">
             {/* Sidebar */}
             <aside className="w-64 bg-white shadow-lg p-6">
                 <h2 className="text-2xl font-bold mb-8">My App</h2>
@@ -84,8 +84,9 @@ export default function DashboardLayout({
                 </nav>
             </aside>
 
-            {/* Content */}
-            <main className="flex-1 p-10">{children}</main>
+            <main className="flex-1 overflow-y-auto h-screen p-8">
+                {children}
+            </main>
         </div>
     );
 }
