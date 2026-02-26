@@ -24,7 +24,6 @@ export default function DashboardHome() {
 
     useEffect(() => {
         const fetchAnalytics = async () => {
-            // Fetch only the created_at column for all students
             const { data: students, error } = await supabase
                 .from('students')
                 .select('created_at');
@@ -37,21 +36,38 @@ export default function DashboardHome() {
             if (students) {
                 setTotalStudents(students.length);
 
-                // Group students by date (YYYY-MM-DD)
+                const today = new Date();
+                const last7Days: string[] = [];
+
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(today.getDate() - i);
+
+                    last7Days.push(
+                        d.toLocaleDateString('ru-RU', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: '2-digit',
+                        })
+                    );
+                }
+
                 const counts: Record<string, number> = {};
+
                 students.forEach((s) => {
                     const date = new Date(s.created_at).toLocaleDateString('ru-RU', {
                         day: '2-digit',
                         month: '2-digit',
                         year: '2-digit',
                     });
+
                     counts[date] = (counts[date] || 0) + 1;
                 });
 
-                // Convert to array and take the last 7 days (or entries)
-                const chartData = Object.entries(counts)
-                    .map(([date, count]) => ({ date, count }))
-                    .slice(-7);
+                const chartData = last7Days.map((date) => ({
+                    date,
+                    count: counts[date] || 0,
+                }));
 
                 setData(chartData);
             }
@@ -61,45 +77,52 @@ export default function DashboardHome() {
     }, []);
 
     return (
-        <div className="p-6 min-h-screen">
+        <>
             <div className="max-w-7xl mx-auto">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">Аналитика</h1>
-                <p className="text-gray-500 mb-8">Обзор регистрации новых студентов</p>
+                <h1 className="text-3xl font-bold text-orange-500 mb-2">Аналитика</h1>
+                <p className="text-gray-300 mb-8">Обзор регистрации новых студентов</p>
 
-                {/* Metric Card */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                        <p className="text-sm text-gray-500 font-medium uppercase">Всего студентов</p>
-                        <h2 className="text-4xl font-bold text-indigo-600 mt-2">{totalStudents}</h2>
+                    <div className="bg-gray-900 p-6 rounded-xl border border-orange-500 shadow-lg">
+                        <p className="text-sm text-orange-300 font-medium uppercase">Всего студентов</p>
+                        <h2 className="text-4xl font-bold text-orange-500 mt-2">{totalStudents}</h2>
                     </div>
                 </div>
 
-                {/* Chart Section */}
-                <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-6">Тренд регистраций (по дням)</h3>
+                <div className="bg-gray-900 p-6 rounded-xl border border-orange-500 shadow-lg">
+                    <h3 className="text-lg font-semibold text-orange-400 mb-6">Тренд регистраций (по дням)</h3>
                     <div className="w-full h-80">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#2c2c2c" />
                                 <XAxis
                                     dataKey="date"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                    tick={{ fill: '#fbbf24', fontSize: 12 }}
                                     dy={10}
                                 />
                                 <YAxis
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: '#9ca3af', fontSize: 12 }}
+                                    tick={{ fill: '#fbbf24', fontSize: 12 }}
                                 />
                                 <Tooltip
-                                    cursor={{ fill: '#f3f4f6' }}
-                                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                                    cursor={{ fill: '#1f1f1f' }}
+                                    contentStyle={{
+                                        backgroundColor: '#1f1f1f',
+                                        borderRadius: '8px',
+                                        border: 'none',
+                                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.3)',
+                                        color: 'white',
+                                    }}
                                 />
                                 <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={40}>
                                     {data.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={index === data.length - 1 ? '#6366f1' : '#e0e7ff'} />
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={index === data.length - 1 ? '#f97316' : '#fbbf24'}
+                                        />
                                     ))}
                                 </Bar>
                             </BarChart>
@@ -107,6 +130,6 @@ export default function DashboardHome() {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
