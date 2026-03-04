@@ -1,22 +1,18 @@
 'use client';
 
 import { supabase } from '@/lib/client';
-import React, { useEffect, useState } from 'react';
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    ResponsiveContainer,
-    Cell,
-} from 'recharts';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
 interface RegistrationData {
     date: string;
     count: number;
 }
+
+const AnalyticsChart = dynamic(() => import('@/components/AnalyticsChart'), {
+    ssr: false,
+    loading: () => <div className="h-80 w-full bg-gray-800 animate-pulse rounded-xl" />
+});
 
 export default function DashboardHome() {
     const [data, setData] = useState<RegistrationData[]>([]);
@@ -91,43 +87,7 @@ export default function DashboardHome() {
 
                 <div className="bg-gray-900 p-6 rounded-xl border border-orange-500 shadow-lg">
                     <h3 className="text-lg font-semibold text-orange-400 mb-6">Тренд регистраций (по дням)</h3>
-                    <div className="w-full h-80">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={data}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#2c2c2c" />
-                                <XAxis
-                                    dataKey="date"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#fbbf24', fontSize: 12 }}
-                                    dy={10}
-                                />
-                                <YAxis
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: '#fbbf24', fontSize: 12 }}
-                                />
-                                <Tooltip
-                                    cursor={{ fill: '#1f1f1f' }}
-                                    contentStyle={{
-                                        backgroundColor: '#1f1f1f',
-                                        borderRadius: '8px',
-                                        border: 'none',
-                                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.3)',
-                                        color: 'white',
-                                    }}
-                                />
-                                <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={40}>
-                                    {data.map((entry, index) => (
-                                        <Cell
-                                            key={`cell-${index}`}
-                                            fill={index === data.length - 1 ? '#f97316' : '#fbbf24'}
-                                        />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
+                    <AnalyticsChart data={data} />
                 </div>
             </div>
         </>
