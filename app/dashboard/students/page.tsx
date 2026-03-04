@@ -166,7 +166,7 @@ export default function StudentsPage() {
                                         </td>
                                         <td className="py-4 px-3">{student.email || '-'}</td>
                                         <td className="py-4 px-3 text-gray-500">
-                                            {student.created_at ? new Date(student.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : '-'}
+                                            {student.created_at ? new Date(student.created_at).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '-'}
                                         </td>
                                         <td className="py-4 px-3">
                                             <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
